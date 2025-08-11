@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Data + artifacts (kept local, reproducible via scripts)
+data/
+artifacts/
+*.pt
+*.zip
+
+# OS/editor
+.DS_Store
+.vscode/
+data/
+artifacts/
+*.pt
+*.zip
+.venv/
+pycache/
+.DS_Store
+.vscode/
