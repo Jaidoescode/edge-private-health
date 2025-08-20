@@ -32,4 +32,6 @@ python -m src.federated.fed_sim --data_root ./data --clients 5 --rounds 3 --loca
 python -m src.eval.report --data_root ./data --ckpt ./artifacts/baseline.pt
 python -m src.eval.report --data_root ./data --ckpt ./artifacts/fedavg.pt
 
-Add tests later (unit tests for data shapes, metrics).
+ms_mean": 0.8539949900000022,
+  "ms_p50": 0.8365204999999376,
+  "ms_p90": 0.9577006
