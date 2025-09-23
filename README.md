@@ -62,3 +62,8 @@ python scripts/export_onnx.py \
 python scripts/bench_onnx.py \
   --onnx ./artifacts/baseline.onnx \
   --file data/raw/ESC-50-master/audio/1-19111-A-24.wav
+
+## Personal Note
+I built this to practice shipping end-to-end ML: data wrangling, feature design, training, federated sim, and deployability (ONNX + latency). I made a few opinionated choices (2s windows, 64 mels, TinyCNN ~150k params) to keep it fast on CPU. If you have ideas to stress-test thresholds or try DP-SGD, open an issue—happy to iterate.
+— Jaideep (@jaidoescode)
+
