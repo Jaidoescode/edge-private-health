@@ -3,10 +3,10 @@
 [![CI](https://github.com/jaidoescode/edge-private-health/actions/workflows/ci.yml/badge.svg)](https://github.com/jaidoescode/edge-private-health/actions/workflows/ci.yml)
 
 **What this is:** a small, production-minded ML project that detects **cough vs. not-cough** from audio, with:
-- **End-to-end pipeline:** data prep → log-mel features → TinyCNN training → eval → artifacts
-- **Federated learning demo** (FedAvg) to simulate privacy-aware training
-- **ONNX export + CPU benchmark** for deployability
-- **Tests + CI** so the repo stays healthy and reproducible
+- End-to-end pipeline: data prep → log-mel features → TinyCNN training → eval → artifacts  
+- Federated learning demo (FedAvg) to simulate privacy-aware training  
+- ONNX export + CPU benchmark for deployability  
+- Tests + CI so the repo stays healthy and reproducible  
 
 > ⚠️ Not for medical use. Demo only.
 
@@ -32,6 +32,16 @@ python -m src.federated.fed_sim --data_root ./data --clients 5 --rounds 3 --loca
 python -m src.eval.report --data_root ./data --ckpt ./artifacts/baseline.pt
 python -m src.eval.report --data_root ./data --ckpt ./artifacts/fedavg.pt
 
-ms_mean": 0.8539949900000022,
-  "ms_p50": 0.8365204999999376,
-  "ms_p90": 0.9577006
+
+📊 Results
+Model Evaluation
+Model	Accuracy	F1	AUC
+Baseline	0.67	0.60	1.00
+FedAvg	0.25	0.40	0.74
+ONNX Inference Latency (CPU, 100 runs)
+Metric	Time (ms)
+Mean	0.71
+P50	0.66
+P90	0.79
+P99	1.76
+Input shape: [1, 1, 64, 201]
