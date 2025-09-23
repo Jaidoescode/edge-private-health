@@ -1,94 +1,64 @@
-# Edge-Private Health (MVP) — Cough vs Other (ESC-50 subset)
+# Edge-Private Health — Cough Detection (ESC-50)
 
-**Goal for today:** ship a minimal, recruiter-ready repo that shows:
-- clear problem framing,
-- a working baseline (tiny CNN) on a public dataset,
-- a toy **federated learning** simulation (FedAvg) over K clients,
-- an optional **DP-SGD** mode (clip per-sample grads + Gaussian noise),
-- clean structure, quickstart commands, and a short results report.
+[![CI](https://github.com/jaidoescode/edge-private-health/actions/workflows/ci.yml/badge.svg)](https://github.com/jaidoescode/edge-private-health/actions/workflows/ci.yml)
 
-> This is an MVP meant to be finished **today**. You can iterate later (Raspberry Pi deploy, secure aggregation, model card).
+**What this is:** a small, production-minded ML project that detects **cough vs. not-cough** from audio, with:
+
+- **End-to-end pipeline:** data prep → log-mel features → TinyCNN training → eval → artifacts  
+- **Federated learning demo** (FedAvg) to simulate privacy-aware training  
+- **ONNX export + CPU benchmark** for deployability  
+- **Tests + CI** so the repo stays healthy and reproducible  
+
+> ⚠️ **Disclaimer:** Demo only. Not for medical use.
+
+---
 
 ## Quickstart
 
 ```bash
-# 1) Create & activate a venv (recommended)
+# 0) (optional) create a venv
 python3 -m venv .venv && source .venv/bin/activate
-
-# 2) Install deps
 pip install -r requirements.txt
 
-# 3) Prepare data (downloads ESC-50 via torchaudio, filters cough vs other)
-python -m src.data.prepare --root ./data --seed 42
-
-# 4) Train a baseline model (single client)
-python -m src.train.train_baseline --data_root ./data --epochs 3
-
-# 5) Run a toy federated simulation (FedAvg with 5 clients)
-python -m src.federated.fed_sim --data_root ./data --clients 5 --rounds 3 --local_epochs 1
-
-# 6) Evaluate saved model
-python -m src.eval.report --data_root ./data --ckpt ./artifacts/baseline.pt
-```
-## Reproducibility & Data
-
-This repo **does not** track datasets or large artifacts. To reproduce results:
-
-```bash
-# 1) Prepare ESC-50 subset locally (downloads ~600MB once)
+# 1) Prepare ESC-50 subset locally (~600MB download once)
 python -m src.data.prepare --root ./data --seed 42
 
 # 2) Train centralized baseline
 python -m src.train.train_baseline --data_root ./data --epochs 10
 
-# 3) (Optional) Federated simulation
+# 3) (optional) Run a federated learning simulation (FedAvg)
 python -m src.federated.fed_sim --data_root ./data --clients 5 --rounds 3 --local_epochs 1
 
-# 4) Evaluate
+# 4) Evaluate checkpoints
 python -m src.eval.report --data_root ./data --ckpt ./artifacts/baseline.pt
 python -m src.eval.report --data_root ./data --ckpt ./artifacts/fedavg.pt
 
-## Results (MVP)
-- Centralized: Acc <BASELINE_ACC>, F1 <BASELINE_F1>, AUC <BASELINE_AUC>
-- FedAvg (5×3): Acc <FEDAVG_ACC>, F1 <FEDAVG_F1>, AUC <FEDAVG_AUC>
+# file-level inference on a WAV
+python -m src.infer --file data/raw/ESC-50-master/audio/1-19111-A-24.wav --ckpt ./artifacts/baseline.pt
 
-Artifacts: `./artifacts/baseline.pt`, `./artifacts/fedavg.pt`
+# optional: adjust decision threshold (default 0.5)
+python -m src.infer --file data/raw/ESC-50-master/audio/1-19111-A-24.wav --ckpt ./artifacts/baseline.pt --threshold 0.7
+
+---
+
+## Results(MVP)
 
 
-## Why this is impressive enough today
-- Uses a **public dataset (ESC-50)** and clean preprocessing.
-- Implements **FedAvg** from scratch (simulated), not just centralized training.
-- Adds an **optional DP-SGD** flag to showcase privacy awareness (replace with Opacus later for production-grade accounting).
-- Clean repo + CI hooks you can expand.
+| Model              | Accuracy |    F1 |   AUC | Notes                               |
+| ------------------ | -------: | ----: | ----: | ----------------------------------- |
+| Centralized        |    0.667 | 0.600 | 1.000 | Trained on full data centrally      |
+| Federated (FedAvg) |    0.250 | 0.400 | 0.741 | 5 clients × 3 rounds, 1 local epoch |
 
-## Repo map
-```
-edge-private-health/
-├─ README.md
-├─ requirements.txt
-├─ pyproject.toml
-├─ Makefile
-├─ configs/
-├─ src/
-│  ├─ data/prepare.py
-│  ├─ models/tiny_cnn.py
-│  ├─ train/train_baseline.py
-│  ├─ federated/fed_utils.py
-│  ├─ federated/fed_sim.py
-│  └─ eval/report.py
-├─ docs/baseline.md
-├─ scripts/
-└─ tests/
-```
+## ONNX Export & CPU Benchmark
 
-## Roadmap (post-MVP)
-- Quantize & export to TFLite/ONNX; measure on Raspberry Pi.
-- Swap toy DP with **Opacus** and add ε accounting.
-- Add **secure aggregation** simulation.
-- Write a **Model Card** and an **Ablation report**.
+Export the trained model to **ONNX** and measure CPU latency.
 
-## Results (MVP)
-- Centralized: Acc 0.667, F1 0.600, AUC 1.000
-- FedAvg (5×3): Acc 0.250, F1 0.400, AUC 0.741
+```bash
+python scripts/export_onnx.py \
+  --ckpt ./artifacts/baseline.pt \
+  --output ./artifacts/baseline.onnx \
+  --sample_file data/raw/ESC-50-master/audio/1-19111-A-24.wav
 
-Artifacts: `./artifacts/baseline.pt`, `./artifacts/fedavg.pt`
+python scripts/bench_onnx.py \
+  --onnx ./artifacts/baseline.onnx \
+  --file data/raw/ESC-50-master/audio/1-19111-A-24.wav
