@@ -1,15 +1,14 @@
-# Edge-Private Health — Cough Detection (ESC-50)
+# Cough Detection with TinyCNN (ESC-50 Audio Dataset)
 
-[![CI](https://github.com/jaidoescode/edge-private-health/actions/workflows/ci.yml/badge.svg)](https://github.com/jaidoescode/edge-private-health/actions/workflows/ci.yml)
+[![CI](https://github.com/jaidoescode/cough-detection-tinycnn/actions/workflows/ci.yml/badge.svg)](https://github.com/jaidoescode/cough-detection-tinycnn/actions/workflows/ci.yml)
 
-**What this is:** a small, production-minded ML project that detects **cough vs. not-cough** from audio, with:
+**What this is:** A production-minded ML project that detects **cough vs. not-cough** from audio using a **TinyCNN** model, with:
+- **End-to-end pipeline:** data prep → log-mel features → TinyCNN training → eval → artifacts
+- **Federated learning demo** (FedAvg) to simulate privacy-aware training
+- **ONNX export + CPU benchmark** for deployability
+- **Tests + CI** so the repo stays healthy and reproducible
 
-- **End-to-end pipeline:** data prep → log-mel features → TinyCNN training → eval → artifacts  
-- **Federated learning demo** (FedAvg) to simulate privacy-aware training  
-- **ONNX export + CPU benchmark** for deployability  
-- **Tests + CI** so the repo stays healthy and reproducible  
-
-> ⚠️ **Disclaimer:** Demo only. Not for medical use.
+> ⚠️ Not for medical use. Demo only.
 
 ---
 
